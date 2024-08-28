@@ -1,0 +1,19 @@
+{
+  "name": "burbz",
+  "version": "1.0.0",
+  "description": "\"mapping app for specific areas\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joshuamarknanninga/burbz.git"
+  },
+  "author": "Joshua Mark Nanninga",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/joshuamarknanninga/burbz/issues"
+  },
+  "homepage": "https://github.com/joshuamarknanninga/burbz#readme"
+}
