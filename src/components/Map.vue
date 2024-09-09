@@ -32,6 +32,15 @@
     }
   },
 };
-    
+
   </script>
+
+<style>
+/* Styles for map container */
+.map-container {
+  width: 100%;
+  height: 500px;
+  border-radius: 0.375rem; /* Equivalent to Tailwind's rounded-md */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Equivalent to Tailwind's shadow */
+}
   
