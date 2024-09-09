@@ -54,6 +54,37 @@
     }
   },
   methods: {
+   // Function to export drawn regions as a JSON file
+   exportDrawnRegions() {
+      const data = this.drawControl.getAll(); // Get all drawn features (polygons, lines, points)
+      const jsonString = JSON.stringify(data); // Convert data to JSON
+
+      // Create a downloadable link for the JSON file
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+
+      // Create a temporary link element for download
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'drawn_regions.json';
+      link.click(); // Trigger the download
+    },
+
+    // Function to import drawn regions from a JSON file
+    importDrawnRegions(event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = JSON.parse(e.target.result);
+        if (this.drawControl) {
+          this.drawControl.set(data); // Load the imported regions into the map
+        }
+      };
+      reader.readAsText(file); // Read the file as text
+    },
+  },
+};
+
     // Function to add markers and popups to the map
     addMarkers() {
       const locations = [
@@ -69,9 +100,7 @@
 
         this.markers.push(marker); // Store markers
       });
-    },
-  },
-};
+    }
 
   </script>
 
@@ -83,4 +112,30 @@
   border-radius: 0.375rem; /* Equivalent to Tailwind's rounded-md */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Equivalent to Tailwind's shadow */
 }
-  
+/* Button styles */
+.controls {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.btn-blue {
+  background-color: #4299e1; /* Tailwind's bg-blue-500 equivalent */
+  color: white;
+}
+
+.btn-blue:hover {
+  background-color: #3182ce; /* Tailwind's bg-blue-600 equivalent */
+}
+
+.btn-gray {
+  background-color: #edf2f7; /* Tailwind's bg-gray-200 equivalent */
+  color: #2d3748; /* Tailwind's text-gray-900 equivalent */
+}
+</style>
