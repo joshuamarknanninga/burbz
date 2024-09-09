@@ -9,14 +9,29 @@
   
   export default {
     name: 'Map',
+    data() {
+    return {
+      map: null, // Store map instance
+    };
+  },
     mounted() {
-      const map = new mapboxgl.Map({
+      // Initialize the map
+      this.map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v11',
         center: [-74.5, 40], // starting position [lng, lat]
         zoom: 9, // starting zoom
       });
-    },
-  };
+      // Add navigation controls
+    this.map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+  },
+  beforeDestroy() {
+    // Clean up map instance when component is destroyed
+    if (this.map) {
+      this.map.remove();
+    }
+  },
+};
+    
   </script>
   
