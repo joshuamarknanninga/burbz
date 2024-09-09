@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
+// Use your Mapbox access token here
 mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN';
 
 const Map = () => {

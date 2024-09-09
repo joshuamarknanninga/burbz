@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{metaDescription}}">
+    <title>{{title}}</title>
+
+    <!-- Link to external stylesheets, such as Tailwind CSS -->
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  </head>
+
+  <body class="bg-gray-100 text-gray-900">
+    <!-- Header Section -->
+    <header class="bg-blue-800 text-white p-4">
+      <div class="container mx-auto">
+        <h1 class="text-4xl font-bold">{{appTitle}}</h1>
+        <p class="mt-2">{{appDescription}}</p>
+      </div>
+    </header>
+
+    <!-- Main Content Block (dynamic content here) -->
+    <main class="container mx-auto py-8">
+      {{{body}}}
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="bg-gray-800 text-white text-center py-4 mt-8">
+      <p>&copy; 2024 {{appTitle}}. All rights reserved.</p>
+    </footer>
+
+    <!-- Load external JavaScript files -->
+    <script src="/scripts/main.js"></script>
+  </body>
+</html>
