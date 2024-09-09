@@ -1,0 +1,39 @@
+{{!-- Extending from main layout --}}
+{{!-- You may pass variables such as title and description here --}}
+
+{{#extend 'main'}}
+  {{!-- Setting up dynamic content --}}
+
+  {{#content 'title'}}Neighborhood Explorer{{/content}}
+  {{#content 'metaDescription'}}Explore neighborhoods through an interactive map with drawing tools, markers, and more.{{/content}}
+
+  {{!-- Main Body Section --}}
+  <section>
+    <h2 class="text-center text-4xl font-bold text-blue-800">Welcome to Neighborhood Explorer</h2>
+    <p class="text-center text-gray-700 mt-4">
+      Discover insights about different neighborhoods through our interactive map.
+    </p>
+    <!-- The interactive Map component will be loaded here -->
+    <div id="map" class="map-container mt-8"></div>
+  </section>
+
+  <section class="mt-8">
+    <h3 class="text-2xl font-bold text-blue-800">About This App</h3>
+    <p class="text-gray-700 mt-4">
+      Neighborhood Explorer is an interactive tool that allows you to explore and discover detailed information about various neighborhoods.
+      By leveraging user-generated data and visual insights, we provide a unique perspective on what each neighborhood has to offer.
+    </p>
+  </section>
+
+  {{!-- Export and Import Actions --}}
+  <section class="mt-8 text-center">
+    <h3 class="text-2xl font-bold text-blue-800">Export/Import Drawn Regions</h3>
+    <p class="text-gray-700 mt-4">
+      Use the buttons below to export your drawn regions as a JSON file or import them back to the map.
+    </p>
+    <div class="mt-4">
+      <button id="exportBtn" class="btn btn-blue">Export Drawn Regions</button>
+      <input type="file" id="importInput" class="btn btn-gray mt-4" />
+    </div>
+  </section>
+{{/extend}}
