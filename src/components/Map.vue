@@ -1,10 +1,18 @@
 <template>
-    <div id="map" style="width: 100%; height: 500px;"></div>
-  </template>
+  <div>
+    <div id="map" class="map-container"></div>
+    <!-- Button to export drawn regions -->
+    <div class="controls">
+      <button @click="exportDrawnRegions" class="btn btn-blue">Export Drawn Regions</button>
+      <!-- Input to import JSON file of regions -->
+      <input type="file" @change="importDrawnRegions" class="btn btn-gray mt-2" />
+    </div>
+  </div>
+</template>
   
   <script>
   import mapboxgl from 'mapbox-gl';
-  // import MapboxDraw from '@mapbox/mapbox-gl-draw';
+  import MapboxDraw from '@mapbox/mapbox-gl-draw';
   import 'mapbox-gl/dist/mapbox-gl.css';
   import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
   
@@ -54,6 +62,24 @@
     }
   },
   methods: {
+
+    // Function to add markers and popups to the map
+    addMarkers() {
+      const locations = [
+        { lng: -74.5, lat: 40, description: 'Marker 1: Example Location' },
+        { lng: -74.6, lat: 40.1, description: 'Marker 2: Another Location' },
+      ];
+
+      locations.forEach((loc) => {
+        const marker = new mapboxgl.Marker()
+          .setLngLat([loc.lng, loc.lat])
+          .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(loc.description)) // Add popup to marker
+          .addTo(this.map);
+
+        this.markers.push(marker); // Store markers
+      });
+    },
+
    // Function to export drawn regions as a JSON file
    exportDrawnRegions() {
       const data = this.drawControl.getAll(); // Get all drawn features (polygons, lines, points)
@@ -84,23 +110,6 @@
     },
   },
 };
-
-    // Function to add markers and popups to the map
-    addMarkers() {
-      const locations = [
-        { lng: -74.5, lat: 40, description: 'Marker 1: Example Location' },
-        { lng: -74.6, lat: 40.1, description: 'Marker 2: Another Location' },
-      ];
-
-      locations.forEach((loc) => {
-        const marker = new mapboxgl.Marker()
-          .setLngLat([loc.lng, loc.lat])
-          .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(loc.description)) // Add popup to marker
-          .addTo(this.map);
-
-        this.markers.push(marker); // Store markers
-      });
-    }
 
   </script>
 
