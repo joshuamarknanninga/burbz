@@ -1,16 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Map from '../components/Map';
-import { Helmet } from 'react-helmet'; // Add for dynamic document head
 
 const Home = () => {
+  useEffect(() => {
+    document.title = 'Neighborhood Explorer';
+    const description =
+      'Explore neighborhoods through interactive maps with drawing tools, markers, and more.';
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.setAttribute('name', 'description');
+      document.head.appendChild(metaDescription);
+    }
+    metaDescription.setAttribute('content', description);
+  }, []);
+
   return (
     <div className="container mx-auto p-4">
-      {/* Dynamic document head for SEO */}
-      <Helmet>
-        <title>Neighborhood Explorer</title>
-        <meta name="description" content="Explore neighborhoods through interactive maps with drawing tools, markers, and more." />
-      </Helmet>
-      
       {/* <section>
         <Map />
       </section> */}
@@ -30,20 +36,19 @@ const Home = () => {
       <section className="mt-8 text-center">
         <h2 className="text-2xl font-bold text-blue-800">Export/Import Drawn Regions</h2>
         <p className="text-gray-700 mt-4">
-          Use the buttons below to export your drawn regions as a JSON file or import them back to the map.
+          Exporting and importing drawn regions is coming soon. We are working on the tools to
+          save and restore your map drawings.
         </p>
         <div className="mt-4">
           <button
-            className="btn btn-blue"
-            onClick={() => document.querySelector('.map-container button:first-child').click()} // Triggers the export button in Map component
+            className="btn btn-blue opacity-60 cursor-not-allowed"
+            disabled
           >
             Export Drawn Regions
           </button>
-          <input
-            type="file"
-            className="btn btn-gray mt-4"
-            onChange={(event) => document.querySelector('.map-container input').dispatchEvent(new Event('change', { bubbles: true }))} // Triggers the import file input in Map component
-          />
+          <button className="btn btn-gray mt-4 opacity-60 cursor-not-allowed" disabled>
+            Import Drawn Regions
+          </button>
         </div>
       </section>
 
