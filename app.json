@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "GlucoseScan Nutrition",
+    "slug": "glucosescan-nutrition",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "scheme": "glucosescan",
+    "splash": {
+      "backgroundColor": "#f4f8ff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.joshuamarknanninga.glucosescan",
+      "infoPlist": {
+        "NSCameraUsageDescription": "GlucoseScan uses the camera to scan QR and UPC food packaging codes for nutrition lookup.",
+        "NSPhotoLibraryAddUsageDescription": "GlucoseScan can save meal snapshots when you choose to export reports."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#f4f8ff"
+      },
+      "package": "com.joshuamarknanninga.glucosescan",
+      "permissions": [
+        "CAMERA"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow GlucoseScan to use your camera for QR and UPC nutrition scans.",
+          "microphonePermission": false
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}

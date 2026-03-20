@@ -1,0 +1,62 @@
+export const productCatalog = {
+  '049000042511': {
+    name: 'Sparkling Citrus Water',
+    brand: 'Hydra Life',
+    servingSize: '355 mL can',
+    carbs: 0,
+    fiber: 0,
+    sugar: 0,
+    protein: 0,
+    fat: 0,
+    sodium: 15,
+    glycemicImpact: 'Minimal impact',
+    note: 'Hydration-first option when you want flavor without carbs.',
+    tags: ['zero sugar', 'hydration'],
+  },
+  '012345678905': {
+    name: 'Whole Grain Cracker Pack',
+    brand: 'Pantry North',
+    servingSize: '8 crackers (30 g)',
+    carbs: 19,
+    fiber: 3,
+    sugar: 2,
+    protein: 4,
+    fat: 5,
+    sodium: 180,
+    glycemicImpact: 'Moderate impact',
+    note: 'Pair with protein to soften the glucose spike window.',
+    tags: ['snack', 'whole grain'],
+  },
+  'https://glucosescan.app/demo/meal/shake': {
+    name: 'Protein Recovery Shake',
+    brand: 'Demo QR Meal',
+    servingSize: '1 bottle (325 mL)',
+    carbs: 11,
+    fiber: 2,
+    sugar: 5,
+    protein: 28,
+    fat: 3,
+    sodium: 170,
+    glycemicImpact: 'Low impact',
+    note: 'QR flow can deep link into richer meal instructions or recalls.',
+    tags: ['qr', 'ready to drink'],
+  },
+};
+
+export const researchShortlist = [
+  {
+    name: 'Expo SDK 54 + expo-camera',
+    verdict: 'Recommended build path',
+    why: 'Fastest way to ship one React Native codebase to iOS and Android while keeping camera permissions and barcode scanning in the managed workflow.',
+  },
+  {
+    name: 'react-native-vision-camera',
+    verdict: 'Best advanced fallback',
+    why: 'Higher-performance camera stack with code scanning and frame processors when you need custom overlays, realtime classification, or native tuning.',
+  },
+  {
+    name: 'Open Food Facts / USDA API integration',
+    verdict: 'Next backend step',
+    why: 'Use the scanned UPC or QR payload to hydrate authoritative nutrition records instead of relying only on bundled mock data.',
+  },
+];
