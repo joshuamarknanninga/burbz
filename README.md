@@ -1,29 +1,48 @@
-# Haunted Object Archive MVP
+# GlucoseScan Nutrition
 
-This project is a React + Vite remake of the original haunted-object-database concept. Instead of a simple map, it focuses on a serious archival workflow for haunted object submissions, moderation, and long-term storage.
+GlucoseScan Nutrition is a rebuilt React Native + Expo prototype for a diabetes-focused nutrition app. It replaces the previous mixed web/mobile code with a single JavaScript codebase aimed at **Android and iPhone deployment**, with camera-driven **UPC and QR code scanning** for nutrition lookup.
 
-## MVP features
+## Why this rebuild
 
-- **Detailed intake form** for haunted object submissions with provenance, chain of custody, evidence, witnesses, and a seriousness attestation.
-- **Storage house archive** that keeps every submitted form in a browsable local archive.
-- **Seriousness vetting system** that scores each submission and routes it into archived, review, or hold states.
-- **Gamified progression** with credibility XP, level titles, badges, and field quests inspired by crowd-powered contribution loops.
-- **Local persistence** via `localStorage` so the MVP works without standing up a backend.
+The referenced `diabetes-nutrition-app` repository mixes an older Expo setup with a generated README and deprecated scanning patterns. This repository now focuses on a maintainable mobile-first architecture:
+
+- **Expo SDK 54** app scaffold for one React Native codebase.
+- **`expo-camera`** for device camera access and barcode scanning.
+- **UPC + QR support** with a normalization helper for the iOS EAN-13/UPC-A edge case.
+- **AsyncStorage meal log** so recent scans persist locally.
+- **Research notes** documenting the chosen JavaScript camera stack and advanced alternatives.
+
+## Included flows
+
+- Scan UPC-A, UPC-E, EAN-13, EAN-8, and QR codes.
+- Show a nutrition card for recognized demo products.
+- Save scanned items into a local meal log.
+- Surface an architecture/research tab directly in-app.
+
+## Project structure
+
+- `App.js` - main mobile UI and scanning flow.
+- `src/data/mockCatalog.js` - demo nutrition records and stack shortlist.
+- `src/utils/barcode.js` - scan normalization and nutrition summary helpers.
+- `docs/research.md` - deeper research and platform recommendations.
+- `app.json` - Expo app metadata plus iOS/Android camera permissions.
 
 ## Getting started
 
 ```bash
 npm install
-npm run dev
+npm run start
 ```
 
-## Build
+Then open the project in Expo Go or build a dev client:
 
 ```bash
-npm run build
+npm run android
+npm run ios
 ```
 
-## Notes
+## Recommended next integrations
 
-- This MVP stores report data in browser storage to simulate a storage house and vetting queue.
-- A future production version could swap the local persistence layer for an API and database-backed moderation service.
+1. Replace the bundled `productCatalog` with Open Food Facts or USDA-backed lookups.
+2. Add auth and cloud sync if users need cross-device meal history.
+3. Upgrade to `react-native-vision-camera` only if you need native frame processors, faster overlays, or more advanced realtime camera control.
