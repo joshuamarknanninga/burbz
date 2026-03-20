@@ -1,27 +1,16 @@
-# Burbz OS MVP
+# Haunted Object Archive MVP
 
-Burbz OS MVP is a lightweight React + Vite interface for running an off-grid Llama AI workstation. The current prototype focuses on a desktop-style experience for local chat, offline file access, model status, and power-aware operation.
+This project is a React + Vite remake of the original haunted-object-database concept. Instead of a simple map, it focuses on a serious archival workflow for haunted object submissions, moderation, and long-term storage.
 
-## What changed in this refactor
+## MVP features
 
-- Replaced the single monolithic `React.createElement` screen with small JSX components.
-- Removed unused Tailwind/PostCSS scaffolding and a conflicting legacy stylesheet.
-- Made each dock app (`Chat`, `Vault`, `Models`, `Power`) render a focused workspace instead of only changing the title.
-- Centralized product copy and dashboard data in one module so the UI is easier to maintain.
-- Improved accessibility with clearer button state, focus styles, and more semantic structure.
+- **Detailed intake form** for haunted object submissions with provenance, chain of custody, evidence, witnesses, and a seriousness attestation.
+- **Storage house archive** that keeps every submitted form in a browsable local archive.
+- **Seriousness vetting system** that scores each submission and routes it into archived, review, or hold states.
+- **Gamified progression** with credibility XP, level titles, badges, and field quests inspired by crowd-powered contribution loops.
+- **Local persistence** via `localStorage` so the MVP works without standing up a backend.
 
-## Project structure
-
-```text
-src/
-  components/   reusable UI building blocks
-  data/         dashboard copy and mock data
-  pages/        route-level screens
-  App.jsx       app shell
-  main.jsx      React entry point
-```
-
-## Development
+## Getting started
 
 ```bash
 npm install
@@ -33,3 +22,8 @@ npm run dev
 ```bash
 npm run build
 ```
+
+## Notes
+
+- This MVP stores report data in browser storage to simulate a storage house and vetting queue.
+- A future production version could swap the local persistence layer for an API and database-backed moderation service.
