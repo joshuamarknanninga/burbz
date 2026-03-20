@@ -431,6 +431,14 @@ textarea {
   padding-left: 18px;
 }
 
+
+.summary-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #d9e5ff;
+  line-height: 1.6;
+}
+
 .cta-card ul {
   padding-left: 18px;
   color: #d9e5ff;
@@ -488,11 +496,18 @@ textarea {
     font-size: clamp(2.2rem, 12vw, 3.4rem);
   }
 
-  .hero-actions,
   .route-grid,
   .detail-grid,
   .community-rail {
     grid-template-columns: 1fr;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .hero-actions button {
+    width: 100%;
   }
 
   .achievement-row {

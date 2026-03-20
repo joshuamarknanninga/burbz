@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 
 const h = React.createElement;
 
@@ -20,34 +20,6 @@ const deviceModes = [
     label: 'PC',
     subtitle: 'Multi-panel command center for power sellers and moderators.',
     stats: ['Dense workspace', 'Keyboard shortcuts', 'Parallel inventory tools'],
-  },
-];
-
-const navItems = [
-  { id: 'market', label: 'Market', icon: '🛍️' },
-  { id: 'routes', label: 'Routes', icon: '🗺️' },
-  { id: 'squad', label: 'Squad', icon: '🤝' },
-  { id: 'garage', label: 'Garage', icon: '🏆' },
-];
-
-const routeCards = [
-  {
-    title: 'Campus loop',
-    distance: '1.4 mi',
-    reward: '+80 XP',
-    status: 'Hot barter zone',
-  },
-  {
-    title: 'Downtown circuit',
-    distance: '2.8 mi',
-    reward: '+1 badge shard',
-    status: 'Quest multiplier live',
-  },
-  {
-    title: 'Weekend flea trail',
-    distance: '5.2 mi',
-    reward: '+120 XP',
-    status: 'Rare trades nearby',
   },
 ];
 
@@ -78,6 +50,66 @@ const achievements = [
   { name: 'Convoy captain', progress: 54, detail: 'Lead 2 squad routes this week.' },
 ];
 
+const routeCards = [
+  {
+    title: 'Campus loop',
+    distance: '1.4 mi',
+    reward: '+80 XP',
+    status: 'Hot barter zone',
+  },
+  {
+    title: 'Downtown circuit',
+    distance: '2.8 mi',
+    reward: '+1 badge shard',
+    status: 'Quest multiplier live',
+  },
+  {
+    title: 'Weekend flea trail',
+    distance: '5.2 mi',
+    reward: '+120 XP',
+    status: 'Rare trades nearby',
+  },
+];
+
+const navItems = [
+  {
+    id: 'market',
+    label: 'Market',
+    icon: '🛍️',
+    eyebrow: 'Market feed',
+    heading: 'Trending trades',
+    detail: 'Browse fast-moving listings, pickup windows, and bundle-friendly barter offers.',
+    items: listings,
+  },
+  {
+    id: 'routes',
+    label: 'Routes',
+    icon: '🗺️',
+    eyebrow: 'Route board',
+    heading: 'Active trade runs',
+    detail: 'Route suggestions combine demand, trust signals, and community safety updates.',
+    items: routeCards,
+  },
+  {
+    id: 'squad',
+    label: 'Squad',
+    icon: '🤝',
+    eyebrow: 'Squad updates',
+    heading: 'Team goals',
+    detail: 'Coordinate convoy meetups, shared pickups, and trusted hand-off locations.',
+    items: achievements,
+  },
+  {
+    id: 'garage',
+    label: 'Garage',
+    icon: '🏆',
+    eyebrow: 'Garage progress',
+    heading: 'Unlocks and streaks',
+    detail: 'Reward reliable trading behavior with badges, XP, and repeat engagement loops.',
+    items: achievements,
+  },
+];
+
 const activityFeed = [
   'Amber completed “Morning Market Run” and unlocked Nitro Negotiator.',
   'Jay marked a safe meetup spot with parking and lighting details.',
@@ -85,15 +117,12 @@ const activityFeed = [
 ];
 
 const Home = () => {
-  const [selectedDevice, setSelectedDevice] = useState('iphone');
-  const [activeNav, setActiveNav] = useState('market');
+  const [selectedDevice, setSelectedDevice] = useState(deviceModes[0].id);
+  const [activeNav, setActiveNav] = useState(navItems[0].id);
   const [searchDraft, setSearchDraft] = useState('Looking for bikes, cameras, and handmade decor within 5 miles');
 
-  const activeDevice = useMemo(
-    () => deviceModes.find((device) => device.id === selectedDevice) ?? deviceModes[0],
-    [selectedDevice],
-  );
-
+  const activeDevice = deviceModes.find((device) => device.id === selectedDevice) ?? deviceModes[0];
+  const activeSection = navItems.find((item) => item.id === activeNav) ?? navItems[0];
   const completionLabel = `${Math.round((achievements.reduce((sum, item) => sum + item.progress, 0) / achievements.length))}% squad progress`;
 
   return h(
@@ -144,7 +173,11 @@ const Home = () => {
             'button',
             {
               key: device.id,
+              id: `${device.id}-tab`,
               type: 'button',
+              role: 'tab',
+              'aria-selected': selectedDevice === device.id,
+              'aria-controls': `${device.id}-panel`,
               className: `device-pill ${selectedDevice === device.id ? 'is-active' : ''}`,
               onClick: () => setSelectedDevice(device.id),
             },
@@ -155,7 +188,12 @@ const Home = () => {
       ),
       h(
         'div',
-        { className: 'device-preview' },
+        {
+          className: 'device-preview',
+          id: `${activeDevice.id}-panel`,
+          role: 'tabpanel',
+          'aria-labelledby': `${activeDevice.id}-tab`,
+        },
         h(
           'article',
           { className: 'phone-frame' },
@@ -172,7 +210,7 @@ const Home = () => {
           { className: 'device-summary card' },
           h('h3', null, `${activeDevice.label} experience`),
           h('p', null, activeDevice.subtitle),
-          h('ul', null, ...activeDevice.stats.map((stat) => h('li', { key: stat }, stat))),
+          h('ul', { className: 'summary-list' }, ...activeDevice.stats.map((stat) => h('li', { key: stat }, stat))),
         ),
       ),
     ),
@@ -181,7 +219,7 @@ const Home = () => {
       { className: 'workspace-grid' },
       h(
         'aside',
-        { className: 'nav-rail card' },
+        { className: 'nav-rail card', 'aria-label': 'Trading workspace sections' },
         h('p', { className: 'rail-title' }, 'Burbz'),
         ...navItems.map((item) =>
           h(
@@ -189,6 +227,7 @@ const Home = () => {
             {
               key: item.id,
               type: 'button',
+              'aria-pressed': activeNav === item.id,
               className: `rail-button ${activeNav === item.id ? 'is-active' : ''}`,
               onClick: () => setActiveNav(item.id),
             },
@@ -252,21 +291,61 @@ const Home = () => {
           h(
             'article',
             { className: 'card' },
-            h('div', { className: 'section-heading compact' }, h('div', null, h('p', { className: 'eyebrow' }, 'Market feed'), h('h3', null, 'Trending trades'))),
             h(
               'div',
-              { className: 'listing-stack' },
-              ...listings.map((listing) =>
-                h(
-                  'article',
-                  { key: listing.name, className: 'listing-card' },
-                  h('strong', null, listing.name),
-                  h('p', null, listing.offer),
-                  h('span', null, listing.vibe),
-                  h('em', null, listing.quest),
+              { className: 'section-heading compact' },
+              h('div', null, h('p', { className: 'eyebrow' }, activeSection.eyebrow), h('h3', null, activeSection.heading)),
+            ),
+            h('p', { className: 'section-copy' }, activeSection.detail),
+            activeSection.id === 'market' &&
+              h(
+                'div',
+                { className: 'listing-stack' },
+                ...listings.map((listing) =>
+                  h(
+                    'article',
+                    { key: listing.name, className: 'listing-card' },
+                    h('strong', null, listing.name),
+                    h('p', null, listing.offer),
+                    h('span', null, listing.vibe),
+                    h('em', null, listing.quest),
+                  ),
                 ),
               ),
-            ),
+            activeSection.id === 'routes' &&
+              h(
+                'div',
+                { className: 'listing-stack' },
+                ...routeCards.map((route) =>
+                  h(
+                    'article',
+                    { key: route.title, className: 'listing-card' },
+                    h('strong', null, route.title),
+                    h('p', null, route.distance),
+                    h('span', null, route.status),
+                    h('em', null, route.reward),
+                  ),
+                ),
+              ),
+            activeSection.id !== 'market' &&
+              activeSection.id !== 'routes' &&
+              h(
+                'div',
+                { className: 'achievement-stack' },
+                ...achievements.map((achievement) =>
+                  h(
+                    'div',
+                    { key: achievement.name, className: 'achievement-row' },
+                    h('div', null, h('strong', null, achievement.name), h('p', null, achievement.detail)),
+                    h(
+                      'div',
+                      { className: 'meter-block' },
+                      h('span', null, `${achievement.progress}%`),
+                      h('div', { className: 'meter-track' }, h('div', { className: 'meter-fill', style: { width: `${achievement.progress}%` } })),
+                    ),
+                  ),
+                ),
+              ),
           ),
           h(
             'article',
@@ -298,8 +377,8 @@ const Home = () => {
         h(
           'article',
           { className: 'card' },
-          h('p', { className: 'eyebrow' }, 'Squad updates'),
-          h('h3', null, 'Waze-style community signals'),
+          h('p', { className: 'eyebrow' }, 'Waze-style community signals'),
+          h('h3', null, 'Squad updates'),
           h('ul', { className: 'activity-feed' }, ...activityFeed.map((item) => h('li', { key: item }, item))),
         ),
         h(
@@ -307,7 +386,9 @@ const Home = () => {
           { className: 'card cta-card' },
           h('p', { className: 'eyebrow' }, 'Launch checklist'),
           h('h3', null, 'Ready for phone and desktop shipping'),
-          h('ul', null,
+          h(
+            'ul',
+            null,
             h('li', null, 'Responsive React layout built for compact, medium, and wide screens.'),
             h('li', null, 'Gamified route loops, streaks, badges, and live trade alerts.'),
             h('li', null, 'Clear structure for future API, auth, and PWA integrations.'),
