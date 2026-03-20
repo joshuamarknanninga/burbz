@@ -1,117 +1,54 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  levelTitles,
-  phenomenonOptions,
-  quests,
-  seriousnessOptions,
-  starterReports,
-} from '../data/hauntedMvp';
+  endgameChecks,
+  initialGameState,
+  portActions,
+  researchNotes,
+  resourceCatalog,
+  routeStops,
+  storageKey,
+  supplyPackages,
+} from '../data/greekTrail';
 
-const storageKey = 'haunted-object-mvp-reports';
-const jokePattern = /\b(?:lol|lmao|haha|prank|meme|bro|just kidding|fake|creepypasta)\b/i;
-const levelStep = 180;
+function cloneInitialState() {
+  return JSON.parse(JSON.stringify(initialGameState));
+}
 
-const emptyForm = {
-  objectName: '',
-  category: '',
-  origin: '',
-  currentLocation: '',
-  acquiredOn: '',
-  phenomena: [],
-  witnessCount: 1,
-  chainOfCustody: '',
-  evidenceSummary: '',
-  incidentNotes: '',
-  seriousness: 'academic',
-  riskLevel: 'medium',
-  attestation: false,
-  submittedBy: '',
-};
-
-function loadReports() {
+function loadGame() {
   if (typeof window === 'undefined') {
-    return starterReports;
+    return cloneInitialState();
   }
 
   const saved = window.localStorage.getItem(storageKey);
   if (!saved) {
-    return starterReports;
+    return cloneInitialState();
   }
 
   try {
-    const parsed = JSON.parse(saved);
-    return Array.isArray(parsed) && parsed.length ? parsed : starterReports;
+    return {
+      ...cloneInitialState(),
+      ...JSON.parse(saved),
+    };
   } catch {
-    return starterReports;
+    return cloneInitialState();
   }
 }
 
-function calculateScore(form) {
-  let score = 0;
-  const notes = [];
-  const longEvidence = form.evidenceSummary.trim().length >= 120;
-  const longCustody = form.chainOfCustody.trim().length >= 90;
-  const longOrigin = form.origin.trim().length >= 50;
-  const hasMultiplePhenomena = form.phenomena.length >= 2;
-  const hasWitnesses = Number(form.witnessCount) >= 2;
-  const textBundle = `${form.objectName} ${form.origin} ${form.evidenceSummary} ${form.incidentNotes}`;
-  const flaggedAsJoke = jokePattern.test(textBundle);
-
-  if (form.objectName.trim().length >= 5) score += 10;
-  if (form.category.trim()) score += 8;
-  if (longOrigin) score += 12;
-  if (form.currentLocation.trim().length >= 8) score += 10;
-  if (form.acquiredOn) score += 6;
-  if (hasMultiplePhenomena) score += 10;
-  if (hasWitnesses) score += 12;
-  if (longCustody) score += 14;
-  if (longEvidence) score += 14;
-  if (form.incidentNotes.trim().length >= 80) score += 8;
-  if (form.attestation) score += 8;
-
-  if (!longEvidence) notes.push('Add fuller evidence notes with equipment, dates, or corroboration.');
-  if (!longCustody) notes.push('Chain of custody is too thin for archive storage.');
-  if (!hasWitnesses) notes.push('A second witness or reviewer would increase trust.');
-  if (flaggedAsJoke) {
-    score -= 45;
-    notes.push('Language suggests the report may not be intended as a serious submission.');
-  }
-
-  if (form.seriousness === 'academic') score += 6;
-  if (form.riskLevel === 'high') score += 4;
-
-  return {
-    score: Math.max(0, Math.min(100, score)),
-    flaggedAsJoke,
-    notes,
-  };
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
 }
 
-function badgeList(reports, level) {
-  const archived = reports.filter((report) => report.status === 'archived').length;
-  const rejected = reports.filter((report) => report.status === 'hold').length;
-  const badges = [];
-
-  if (archived >= 1) badges.push('First sealed relic');
-  if (archived >= 3) badges.push('Vault regular');
-  if (reports.some((report) => report.witnessCount >= 3)) badges.push('Multi-witness tracker');
-  if (rejected === 0 && reports.length >= 3) badges.push('Clean credibility streak');
-  if (level >= 4) badges.push('Senior custodian');
-
-  return badges;
+function sumResources(resources) {
+  return Object.values(resources).reduce((sum, value) => sum + value, 0);
 }
 
-function formatDate(value) {
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(new Date(value));
+function formatDanger(level) {
+  return level.charAt(0).toUpperCase() + level.slice(1);
 }
 
-function MetricCard({ label, value, caption }) {
+function MetricCard({ label, value, caption, tone = 'default' }) {
   return (
-    <article className="metric-card">
+    <article className={`metric-card tone-${tone}`}>
       <span>{label}</span>
       <strong>{value}</strong>
       <p>{caption}</p>
@@ -129,408 +66,432 @@ function SectionTitle({ eyebrow, title, body }) {
   );
 }
 
-function ReportCard({ report, onStatusChange }) {
+function LogEntry({ entry }) {
   return (
-    <article className={`report-card status-${report.status}`}>
-      <div className="report-card-top">
-        <div>
-          <p className="report-status">{report.status}</p>
-          <h3>{report.objectName}</h3>
-        </div>
-        <div className="score-pill">{report.score}/100</div>
+    <article className={`log-entry log-${entry.type}`}>
+      <div>
+        <p>Day {entry.day}</p>
+        <h3>{entry.title}</h3>
       </div>
-
-      <dl>
-        <div>
-          <dt>Category</dt>
-          <dd>{report.category}</dd>
-        </div>
-        <div>
-          <dt>Stored at</dt>
-          <dd>{report.currentLocation}</dd>
-        </div>
-        <div>
-          <dt>Witnesses</dt>
-          <dd>{report.witnessCount}</dd>
-        </div>
-        <div>
-          <dt>Phenomena</dt>
-          <dd>{report.phenomena.join(', ')}</dd>
-        </div>
-      </dl>
-
-      <p className="report-copy">{report.evidenceSummary}</p>
-      <p className="moderation-note">Moderator note: {report.moderationNote}</p>
-
-      {onStatusChange ? (
-        <div className="card-actions">
-          <button type="button" onClick={() => onStatusChange(report.id, 'archived')}>
-            Seal in storage house
-          </button>
-          <button type="button" onClick={() => onStatusChange(report.id, 'review')}>
-            Keep in review
-          </button>
-          <button type="button" className="ghost-button" onClick={() => onStatusChange(report.id, 'hold')}>
-            Hold back
-          </button>
-        </div>
-      ) : null}
+      <span>{entry.text}</span>
     </article>
   );
 }
 
+function StopCard({ stop, isCurrent, isVisited }) {
+  return (
+    <article className={`stop-card ${isCurrent ? 'is-current' : ''} ${isVisited ? 'is-visited' : ''}`}>
+      <div className="stop-card-top">
+        <div>
+          <p>{stop.subtitle}</p>
+          <h3>{stop.name}</h3>
+        </div>
+        <div className={`danger-pill danger-${stop.danger}`}>{formatDanger(stop.danger)}</div>
+      </div>
+      <span>{stop.summary}</span>
+      <p>{stop.sourceNote}</p>
+    </article>
+  );
+}
+
+function nextStopFor(progress) {
+  return routeStops[Math.min(routeStops.length - 1, progress + 1)];
+}
+
+function buildTravelEvent(state) {
+  const stop = nextStopFor(state.progress);
+  const favorMod = Math.floor(state.favor / 20);
+  const moraleMod = state.morale >= 70 ? 1 : 0;
+  const crewLoss = clamp(stop.danger === 'extreme' ? 8 - favorMod - moraleMod : stop.danger === 'high' ? 5 - favorMod : 3 - favorMod, 0, 9);
+  const hullLoss = clamp(stop.danger === 'extreme' ? 18 - favorMod * 2 : stop.danger === 'high' ? 12 - favorMod : 7 - favorMod, 2, 18);
+  const barleyUse = stop.danger === 'extreme' ? 4 : 3;
+  const wineUse = stop.danger === 'extreme' ? 2 : 1;
+  const oilUse = stop.danger === 'high' || stop.danger === 'extreme' ? 1 : 0;
+
+  let title = `Made landfall at ${stop.name}`;
+  let text = stop.detail;
+  let favorShift = 0;
+  let moraleShift = stop.danger === 'medium' ? 2 : -2;
+
+  if (stop.id === 'lemnos') {
+    title = 'Lemnos offers comfort and delay';
+    text = 'Trade is easy here, but the crew is tempted to linger. You gain a little morale and time slips away.';
+    moraleShift = 6;
+  }
+
+  if (stop.id === 'cyzicus') {
+    title = 'Storms scatter the Argo near Cyzicus';
+    text = 'Bad weather and confusion around Mysia cost you crew and hull strength before the way east opens again.';
+    moraleShift = -6;
+  }
+
+  if (stop.id === 'salmydessus') {
+    title = 'Phineus reveals the strait';
+    text = 'After costly aid to the seer, you gain navigation knowledge. The price is supplies; the reward is better odds ahead.';
+    favorShift = 8;
+    moraleShift = 1;
+  }
+
+  if (stop.id === 'symplegades') {
+    title = 'The Argo threads the Clashing Rocks';
+    text = 'The crew rows through the narrowing passage with only a splinter-thin margin. If the gods favor you, the ship survives.';
+    favorShift = state.favor >= 28 ? 10 : -10;
+    moraleShift = state.favor >= 28 ? 5 : -9;
+  }
+
+  if (stop.id === 'aia') {
+    title = 'You stand before Aeetes in Colchis';
+    text = 'The final test is no longer about miles. It is about whether you preserved enough people, stores, ship, and divine backing to claim the Fleece.';
+    moraleShift = 0;
+  }
+
+  return {
+    stop,
+    delta: {
+      day: 6 + state.progress,
+      crew: -crewLoss,
+      hull: -hullLoss,
+      morale: moraleShift,
+      favor: favorShift,
+      resources: {
+        barley: -barleyUse,
+        wine: -wineUse,
+        oliveOil: -oilUse,
+        drachmae: 0,
+      },
+    },
+    log: {
+      type: stop.id === 'symplegades' ? 'danger' : 'story',
+      title,
+      text,
+    },
+  };
+}
+
+function applyDelta(state, delta) {
+  const next = {
+    ...state,
+    day: state.day + delta.day,
+    crew: clamp(state.crew + delta.crew, 0, 54),
+    morale: clamp(state.morale + delta.morale, 0, 100),
+    hull: clamp(state.hull + delta.hull, 0, 100),
+    favor: clamp(state.favor + delta.favor, 0, 100),
+    resources: {
+      barley: clamp(state.resources.barley + delta.resources.barley, 0, 40),
+      wine: clamp(state.resources.wine + delta.resources.wine, 0, 30),
+      oliveOil: clamp(state.resources.oliveOil + delta.resources.oliveOil, 0, 24),
+      drachmae: clamp(state.resources.drachmae + delta.resources.drachmae, 0, 400),
+    },
+  };
+
+  if (next.resources.barley === 0) {
+    next.crew = clamp(next.crew - 4, 0, 54);
+    next.morale = clamp(next.morale - 10, 0, 100);
+  }
+
+  if (next.resources.wine === 0) {
+    next.morale = clamp(next.morale - 4, 0, 100);
+  }
+
+  if (next.hull <= 0 || next.crew <= 0) {
+    next.status = 'lost';
+    next.outcome = 'The Argo is no longer seaworthy enough to continue the expedition.';
+  }
+
+  return next;
+}
+
+function resolveOutcome(state) {
+  if (state.status === 'lost') {
+    return state;
+  }
+
+  if (state.progress < routeStops.length - 1) {
+    return state;
+  }
+
+  const meetsChecks =
+    state.crew >= endgameChecks.minCrew &&
+    state.favor >= endgameChecks.minFavor &&
+    state.hull >= endgameChecks.minHull &&
+    state.resources.barley >= endgameChecks.minBarley;
+
+  return {
+    ...state,
+    status: meetsChecks ? 'won' : 'lost',
+    outcome: meetsChecks
+      ? 'You secure the Golden Fleece and bring the Argo to a legendary victory.'
+      : 'You reached Colchis, but lacked the crew, stores, hull integrity, or divine favor to finish the quest.',
+  };
+}
+
 export default function Home() {
-  const [reports, setReports] = useState(loadReports);
-  const [form, setForm] = useState(emptyForm);
-  const [activeStorageFilter, setActiveStorageFilter] = useState('all');
+  const [game, setGame] = useState(loadGame);
   const [flash, setFlash] = useState('');
 
   useEffect(() => {
-    window.localStorage.setItem(storageKey, JSON.stringify(reports));
-  }, [reports]);
+    window.localStorage.setItem(storageKey, JSON.stringify(game));
+  }, [game]);
 
-  const stats = useMemo(() => {
-    const archived = reports.filter((report) => report.status === 'archived').length;
-    const review = reports.filter((report) => report.status === 'review').length;
-    const hold = reports.filter((report) => report.status === 'hold').length;
-    const totalXp = reports.reduce((sum, report) => sum + (report.xpAwarded ?? 0), 0);
-    const level = Math.max(1, Math.floor(totalXp / levelStep) + 1);
-    const currentLevelXp = totalXp - (level - 1) * levelStep;
-    const progress = Math.min(100, Math.round((currentLevelXp / levelStep) * 100));
+  const currentStop = routeStops[game.progress];
+  const upcomingStop = nextStopFor(game.progress);
+  const carryLoad = useMemo(() => sumResources(game.resources), [game.resources]);
 
-    return {
-      archived,
-      review,
-      hold,
-      totalXp,
-      level,
-      progress,
-      levelTitle: levelTitles[Math.min(levelTitles.length - 1, level - 1)],
-      badges: badgeList(reports, level),
-    };
-  }, [reports]);
+  const statusTone = game.status === 'won' ? 'success' : game.status === 'lost' ? 'danger' : 'default';
 
-  const filteredReports = useMemo(() => {
-    if (activeStorageFilter === 'all') {
-      return reports;
+  const pushLog = (nextState, log) => ({
+    ...nextState,
+    log: [
+      {
+        day: nextState.day,
+        ...log,
+      },
+      ...nextState.log,
+    ].slice(0, 12),
+  });
+
+  const setMessage = (message) => {
+    setFlash(message);
+    window.clearTimeout(window.__argosFlashTimer);
+    window.__argosFlashTimer = window.setTimeout(() => setFlash(''), 2200);
+  };
+
+  const applyPortAction = (actionId) => {
+    if (game.status !== 'playing') {
+      return;
     }
 
-    return reports.filter((report) => report.status === activeStorageFilter);
-  }, [activeStorageFilter, reports]);
+    if (actionId === 'trade') {
+      if (game.resources.drachmae < 18) {
+        setMessage('You need more silver before the merchants will bargain.');
+        return;
+      }
 
-  const vettingQueue = useMemo(
-    () => reports.filter((report) => report.status === 'review' || report.status === 'hold'),
-    [reports],
-  );
+      const next = pushLog(
+        applyDelta(game, {
+          day: 2,
+          crew: 0,
+          morale: 4,
+          hull: 0,
+          favor: 0,
+          resources: { barley: 3, wine: 1, oliveOil: 1, drachmae: -18 },
+        }),
+        {
+          type: 'trade',
+          title: 'Port trade completed',
+          text: 'You swap silver for grain, oil, and wine while the crew enjoys a calmer market day.',
+        },
+      );
 
-  const handleChange = (field, value) => {
-    setForm((current) => ({ ...current, [field]: value }));
+      setGame(next);
+      setMessage('Trade completed.');
+      return;
+    }
+
+    if (actionId === 'sacrifice') {
+      if (game.resources.wine < 1 || game.resources.barley < 1) {
+        setMessage('You need both grain and wine for a proper offering.');
+        return;
+      }
+
+      const next = pushLog(
+        applyDelta(game, {
+          day: 1,
+          crew: 0,
+          morale: 2,
+          hull: 0,
+          favor: 12,
+          resources: { barley: -1, wine: -1, oliveOil: 0, drachmae: 0 },
+        }),
+        {
+          type: 'boon',
+          title: 'Libation and sacrifice offered',
+          text: 'The crew pours wine and burns grain before departure, asking Apollo and the sea gods for a safer passage.',
+        },
+      );
+
+      setGame(next);
+      setMessage('The omens improve.');
+      return;
+    }
+
+    if (actionId === 'rest') {
+      const next = pushLog(
+        applyDelta(game, {
+          day: 2,
+          crew: 1,
+          morale: 8,
+          hull: 2,
+          favor: -2,
+          resources: { barley: -2, wine: -1, oliveOil: 0, drachmae: 0 },
+        }),
+        {
+          type: 'story',
+          title: 'A feast day steadies the crew',
+          text: 'Rest restores confidence, but every pause eats into your stores and momentum.',
+        },
+      );
+
+      setGame(next);
+      setMessage('The rowers recover.');
+      return;
+    }
+
+    const travelEvent = buildTravelEvent(game);
+    let next = applyDelta(game, travelEvent.delta);
+    next.progress = clamp(game.progress + 1, 0, routeStops.length - 1);
+    next.visitedStops = [...new Set([...game.visitedStops, travelEvent.stop.id])];
+    next = pushLog(next, travelEvent.log);
+    next = resolveOutcome(next);
+    setGame(next);
+    setMessage(next.status === 'playing' ? `You reached ${travelEvent.stop.name}.` : next.outcome);
   };
 
-  const handlePhenomenonToggle = (item) => {
-    setForm((current) => ({
-      ...current,
-      phenomena: current.phenomena.includes(item)
-        ? current.phenomena.filter((value) => value !== item)
-        : [...current.phenomena, item],
-    }));
-  };
+  const buyPackage = (pkg) => {
+    if (game.status !== 'playing') {
+      return;
+    }
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+    if (game.resources.drachmae < pkg.cost) {
+      setMessage('Not enough silver for that package.');
+      return;
+    }
 
-    const review = calculateScore(form);
-    const status = review.flaggedAsJoke ? 'hold' : review.score >= 80 ? 'archived' : review.score >= 55 ? 'review' : 'hold';
-    const xpAwarded = status === 'archived' ? 140 : status === 'review' ? 85 : 20;
-    const moderationNote = review.flaggedAsJoke
-      ? 'Submission held: rewrite in a formal tone and add verifiable details.'
-      : review.notes[0] ?? 'Meets the minimum evidence bar for the current queue.';
-
-    const nextReport = {
-      id: `case-${Date.now()}`,
-      ...form,
-      status,
-      score: review.score,
-      xpAwarded,
-      moderationNote,
-      createdAt: new Date().toISOString(),
+    const delta = {
+      day: 0,
+      crew: 0,
+      morale: 1,
+      hull: pkg.effect.hull ?? 0,
+      favor: pkg.effect.favor ?? 0,
+      resources: {
+        barley: pkg.effect.barley ?? 0,
+        wine: pkg.effect.wine ?? 0,
+        oliveOil: pkg.effect.oliveOil ?? 0,
+        drachmae: -pkg.cost,
+      },
     };
 
-    setReports((current) => [nextReport, ...current]);
-    setForm(emptyForm);
-    setFlash(
-      status === 'archived'
-        ? 'Case accepted into the storage house. Credibility XP awarded.'
-        : status === 'review'
-          ? 'Case sent to the vetting queue. Add more proof to unlock archive status.'
-          : 'Case held back. The seriousness filter detected weak or joking details.',
-    );
+    const next = pushLog(applyDelta(game, delta), {
+      type: 'trade',
+      title: pkg.title,
+      text: pkg.note,
+    });
+
+    setGame(next);
+    setMessage(`${pkg.title} added to the manifest.`);
   };
 
-  const handleStatusChange = (id, status) => {
-    setReports((current) =>
-      current.map((report) =>
-        report.id === id
-          ? {
-              ...report,
-              status,
-              xpAwarded:
-                status === 'archived' ? Math.max(report.xpAwarded, 140) : status === 'review' ? 90 : 20,
-              moderationNote:
-                status === 'archived'
-                  ? 'Moderator sealed this case into long-term storage.'
-                  : status === 'review'
-                    ? 'Moderator requests another evidence pass before archiving.'
-                    : 'Moderator held the report outside the archive due to credibility concerns.',
-            }
-          : report,
-      ),
-    );
+  const resetGame = () => {
+    const next = cloneInitialState();
+    setGame(next);
+    setMessage('A new voyage begins from Iolcus.');
   };
 
   return (
-    <main className="haunted-app">
-      <section className="hero-panel haunted-hero">
+    <main className="myth-app">
+      <section className="hero-panel myth-hero">
         <div>
-          <p className="eyebrow">Haunted object database / React MVP</p>
-          <h1>Build a serious, gamified archive for haunted objects — not campfire jokes.</h1>
+          <p className="eyebrow">React MVP · myth-history route</p>
+          <h1>Argo Trail</h1>
           <p className="hero-copy">
-            This remake turns the original haunted object map idea into a React-first intake and
-            review hub with formal submissions, a storage house archive, and a trust system that
-            rewards evidence-backed fieldwork.
+            An Oregon Trail-style survival game that follows Jason’s voyage from Iolcus to Colchis using a
+            route, dangers, and logistics grounded in ancient Greek mythic sources.
           </p>
           <div className="hero-focus">
-            <span className="hero-focus-label">How it works</span>
-            <h2>Detailed forms enter a vetting queue before public archive placement.</h2>
+            <span className="hero-focus-label">Current objective</span>
+            <h2>{game.status === 'playing' ? `Reach ${upcomingStop.name}` : game.outcome}</h2>
             <p>
-              Every report is scored for seriousness, witness quality, chain of custody, and depth
-              of evidence. Strong cases enter the storage house immediately, while weak or joking
-              entries are held back for moderator review.
+              You are managing a {game.crew}-person expedition with ritual obligations, fragile ship timbers,
+              and staple cargo drawn from Greek trade and diet.
             </p>
           </div>
+          {flash ? <div className="flash-message">{flash}</div> : null}
         </div>
 
-        <div className="hero-stats haunted-metrics">
-          <MetricCard
-            label="Archived relics"
-            value={stats.archived}
-            caption="Cases currently sealed in the storage house."
-          />
-          <MetricCard
-            label="Vetting queue"
-            value={stats.review + stats.hold}
-            caption="Reports awaiting approval, edits, or rejection."
-          />
-          <MetricCard
-            label="Credibility level"
-            value={`Lv.${stats.level}`}
-            caption={`${stats.levelTitle} • ${stats.totalXp} XP banked.`}
-          />
+        <div className="hero-side">
+          <MetricCard label="Crew" value={`${game.crew}/54`} caption="Diodorus gives Jason a 54-person expedition." />
+          <MetricCard label="Hull" value={`${game.hull}%`} caption="Ship integrity matters most at the Symplegades." />
+          <MetricCard label="Favor" value={`${game.favor}%`} caption="Offerings and omens shape several mythic outcomes." />
+          <MetricCard label="Quest status" value={game.status} caption={game.outcome || 'Still sailing east.'} tone={statusTone} />
         </div>
       </section>
 
       <section className="dashboard-grid">
-        <article className="panel panel-form">
+        <article className="panel">
           <SectionTitle
-            eyebrow="1. Field intake"
-            title="Detailed haunted object submission"
-            body="Collect facts the way an archivist or investigator would."
+            eyebrow="Voyage state"
+            title={`Day ${game.day} near ${currentStop.name}`}
+            body="The path follows the outward Argonaut route across the northern Aegean and into the Black Sea."
           />
 
-          <form className="intake-form" onSubmit={handleSubmit}>
-            <label>
-              Object name
-              <input
-                value={form.objectName}
-                onChange={(event) => handleChange('objectName', event.target.value)}
-                placeholder="Ex: Blackthorn Mourning Locket"
-                required
-              />
-            </label>
+          <div className="metrics-row">
+            <MetricCard label="Morale" value={`${game.morale}%`} caption="Feasts, losses, and omens affect the rowers." />
+            <MetricCard label="Cargo load" value={carryLoad} caption="Barley, wine, oil, and silver all compete for room." />
+            <MetricCard label="Next danger" value={formatDanger(upcomingStop.danger)} caption={upcomingStop.subtitle} />
+          </div>
 
-            <div className="form-split">
-              <label>
-                Category
-                <input
-                  value={form.category}
-                  onChange={(event) => handleChange('category', event.target.value)}
-                  placeholder="Artifact, furniture, jewelry..."
-                  required
-                />
-              </label>
+          <div className="resource-grid">
+            {resourceCatalog.map((resource) => (
+              <article key={resource.id} className="resource-card">
+                <div>
+                  <p>{resource.label}</p>
+                  <strong>
+                    {game.resources[resource.id]} {resource.unit}
+                  </strong>
+                </div>
+                <span>{resource.description}</span>
+              </article>
+            ))}
+          </div>
 
-              <label>
-                Witness count
-                <input
-                  type="number"
-                  min="1"
-                  value={form.witnessCount}
-                  onChange={(event) => handleChange('witnessCount', Number(event.target.value))}
-                  required
-                />
-              </label>
-            </div>
+          <div className="action-grid">
+            {portActions.map((action) => (
+              <button key={action.id} type="button" className="action-card" onClick={() => applyPortAction(action.id)}>
+                <strong>{action.label}</strong>
+                <span>{action.description}</span>
+              </button>
+            ))}
+          </div>
 
-            <label>
-              Origin and provenance
-              <textarea
-                value={form.origin}
-                onChange={(event) => handleChange('origin', event.target.value)}
-                placeholder="Explain where the object came from, who handled it, and why it matters."
-                required
-              />
-            </label>
-
-            <div className="form-split">
-              <label>
-                Current storage location
-                <input
-                  value={form.currentLocation}
-                  onChange={(event) => handleChange('currentLocation', event.target.value)}
-                  placeholder="Shelf, vault, locker, museum room..."
-                  required
-                />
-              </label>
-
-              <label>
-                Acquisition date
-                <input
-                  type="date"
-                  value={form.acquiredOn}
-                  onChange={(event) => handleChange('acquiredOn', event.target.value)}
-                  required
-                />
-              </label>
-            </div>
-
-            <fieldset>
-              <legend>Reported phenomena</legend>
-              <div className="check-grid">
-                {phenomenonOptions.map((item) => (
-                  <label key={item} className="check-pill">
-                    <input
-                      type="checkbox"
-                      checked={form.phenomena.includes(item)}
-                      onChange={() => handlePhenomenonToggle(item)}
-                    />
-                    <span>{item}</span>
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-
-            <label>
-              Chain of custody
-              <textarea
-                value={form.chainOfCustody}
-                onChange={(event) => handleChange('chainOfCustody', event.target.value)}
-                placeholder="Document the transfer history from previous owner to current vault."
-                required
-              />
-            </label>
-
-            <label>
-              Evidence summary
-              <textarea
-                value={form.evidenceSummary}
-                onChange={(event) => handleChange('evidenceSummary', event.target.value)}
-                placeholder="Describe interviews, recordings, environmental readings, or sworn testimony."
-                required
-              />
-            </label>
-
-            <label>
-              Incident notes
-              <textarea
-                value={form.incidentNotes}
-                onChange={(event) => handleChange('incidentNotes', event.target.value)}
-                placeholder="Keep speculation separate from observed events."
-                required
-              />
-            </label>
-
-            <div className="form-split triple">
-              <label>
-                Report style
-                <select
-                  value={form.seriousness}
-                  onChange={(event) => handleChange('seriousness', event.target.value)}
-                >
-                  {seriousnessOptions.map((option) => (
-                    <option key={option.id} value={option.id}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <label>
-                Risk level
-                <select value={form.riskLevel} onChange={(event) => handleChange('riskLevel', event.target.value)}>
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                </select>
-              </label>
-
-              <label>
-                Submitted by
-                <input
-                  value={form.submittedBy}
-                  onChange={(event) => handleChange('submittedBy', event.target.value)}
-                  placeholder="Investigator or archive team"
-                  required
-                />
-              </label>
-            </div>
-
-            <label className="attestation">
-              <input
-                type="checkbox"
-                checked={form.attestation}
-                onChange={(event) => handleChange('attestation', event.target.checked)}
-              />
-              <span>
-                I confirm this is a serious submission intended for archival review, not a joke or
-                fictional post.
-              </span>
-            </label>
-
-            <button type="submit" className="primary-button">
-              Submit haunted object case
+          <div className="action-row">
+            <button type="button" className="ghost-button" onClick={resetGame}>
+              Restart voyage
             </button>
-
-            {flash ? <p className="flash-message">{flash}</p> : null}
-          </form>
+          </div>
         </article>
 
         <article className="panel">
           <SectionTitle
-            eyebrow="2. Credibility engine"
-            title="Automated seriousness vetting"
-            body="A lightweight moderation system for the MVP."
+            eyebrow="Provisioning"
+            title="Load historically grounded supplies"
+            body="These add-ons turn modern game inventory into Greek staples and ritual equipment."
           />
 
-          <div className="rubric-list">
-            <div>
-              <strong>High trust signals</strong>
-              <p>Long-form evidence, clear custody records, 2+ witnesses, and formal attestation.</p>
-            </div>
-            <div>
-              <strong>Hold triggers</strong>
-              <p>Thin provenance, meme language, no corroboration, or vague storage details.</p>
-            </div>
-            <div>
-              <strong>Queue logic</strong>
-              <p>80+ auto-archives, 55-79 enters review, and lower scores stay on hold.</p>
-            </div>
+          <div className="package-list">
+            {supplyPackages.map((pkg) => (
+              <article key={pkg.id} className="package-card">
+                <div className="package-top">
+                  <div>
+                    <p>{pkg.cost} silver</p>
+                    <h3>{pkg.title}</h3>
+                  </div>
+                  <button type="button" onClick={() => buyPackage(pkg)}>
+                    Buy
+                  </button>
+                </div>
+                <span>{pkg.note}</span>
+              </article>
+            ))}
           </div>
 
-          <div className="queue-stack">
-            {vettingQueue.map((report) => (
-              <ReportCard key={report.id} report={report} onStatusChange={handleStatusChange} />
-            ))}
-            {!vettingQueue.length ? <p className="empty-state">No cases waiting — the vault team is caught up.</p> : null}
+          <div className="checklist-card">
+            <p>Victory thresholds</p>
+            <ul>
+              <li>At least {endgameChecks.minCrew} crew alive in Colchis.</li>
+              <li>At least {endgameChecks.minHull}% hull integrity remaining.</li>
+              <li>At least {endgameChecks.minFavor}% divine favor.</li>
+              <li>At least {endgameChecks.minBarley} barley sacks for the final trial.</li>
+            </ul>
           </div>
         </article>
       </section>
@@ -538,89 +499,45 @@ export default function Home() {
       <section className="dashboard-grid lower-grid">
         <article className="panel">
           <SectionTitle
-            eyebrow="3. Storage house"
-            title="Archived forms and sealed object records"
-            body="Every form is persisted locally for MVP review and archive browsing."
+            eyebrow="Route"
+            title="Mythic itinerary to Colchis"
+            body="Each stop summarizes how the game adapts an episode from ancient Argonaut tradition."
           />
-
-          <div className="filter-row">
-            {['all', 'archived', 'review', 'hold'].map((filter) => (
-              <button
-                key={filter}
-                type="button"
-                className={activeStorageFilter === filter ? 'is-active' : ''}
-                onClick={() => setActiveStorageFilter(filter)}
-              >
-                {filter}
-              </button>
-            ))}
-          </div>
-
-          <div className="storage-grid">
-            {filteredReports.map((report) => (
-              <article key={report.id} className="storage-card">
-                <div className="storage-top">
-                  <div>
-                    <p>{report.category}</p>
-                    <h3>{report.objectName}</h3>
-                  </div>
-                  <span>{report.status}</span>
-                </div>
-                <ul>
-                  <li>Stored at: {report.currentLocation}</li>
-                  <li>Acquired: {formatDate(report.acquiredOn || report.createdAt)}</li>
-                  <li>Filed by: {report.submittedBy}</li>
-                  <li>Phenomena: {report.phenomena.join(', ')}</li>
-                </ul>
-              </article>
+          <div className="stop-list">
+            {routeStops.map((stop, index) => (
+              <StopCard
+                key={stop.id}
+                stop={stop}
+                isCurrent={index === game.progress}
+                isVisited={game.visitedStops.includes(stop.id)}
+              />
             ))}
           </div>
         </article>
 
         <article className="panel">
           <SectionTitle
-            eyebrow="4. Gamification"
-            title="Level up like a trusted field network"
-            body="Inspired by crowd-powered progress systems, but tailored to paranormal archive work."
+            eyebrow="Research notes"
+            title="What this MVP is based on"
+            body="These notes explain the research decisions behind the design, scope, and tone."
           />
-
-          <div className="level-panel">
-            <div>
-              <p className="level-label">Current rank</p>
-              <h3>
-                Level {stats.level}: {stats.levelTitle}
-              </h3>
-              <p>
-                Your archive reputation grows when you submit serious reports, help moderators seal
-                review cases, and avoid flimsy or joking entries.
-              </p>
-            </div>
-            <div className="level-progress">
-              <div className="progress-bar">
-                <span style={{ width: `${stats.progress}%` }} />
-              </div>
-              <strong>{stats.progress}% to next level</strong>
-            </div>
-          </div>
-
-          <div className="badge-wrap">
-            {stats.badges.map((badge) => (
-              <span key={badge} className="badge-pill">
-                {badge}
-              </span>
-            ))}
-            {!stats.badges.length ? <span className="badge-pill muted">No badges yet</span> : null}
-          </div>
-
-          <div className="quest-list">
-            {quests.map((quest) => (
-              <article key={quest.title}>
-                <div>
-                  <p>{quest.reward}</p>
-                  <h3>{quest.title}</h3>
-                </div>
-                <span>{quest.detail}</span>
+          <div className="notes-list">
+            {researchNotes.map((note) => (
+              <article key={note.title} className="note-card">
+                <h3>{note.title}</h3>
+                <p>{note.body}</p>
               </article>
+            ))}
+          </div>
+
+          <SectionTitle
+            eyebrow="Captain's log"
+            title="Recent events"
+            body="Your latest choices, disasters, and ritual wins stay pinned here."
+          />
+          <div className="log-list">
+            {game.log.map((entry, index) => (
+              <LogEntry key={`${entry.title}-${index}`} entry={entry} />
             ))}
           </div>
         </article>

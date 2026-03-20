@@ -1,14 +1,24 @@
-# Haunted Object Archive MVP
+# Argo Trail MVP
 
-This project is a React + Vite remake of the original haunted-object-database concept. Instead of a simple map, it focuses on a serious archival workflow for haunted object submissions, moderation, and long-term storage.
+This project is now a React + Vite prototype for an Oregon Trail-style survival game set on Jason's voyage to Colchis. The goal is to make the player manage supplies, morale, crew, hull integrity, and divine favor while moving through a route grounded in ancient Greek mythic sources.
 
-## MVP features
+## Design goals
 
-- **Detailed intake form** for haunted object submissions with provenance, chain of custody, evidence, witnesses, and a seriousness attestation.
-- **Storage house archive** that keeps every submitted form in a browsable local archive.
-- **Seriousness vetting system** that scores each submission and routes it into archived, review, or hold states.
-- **Gamified progression** with credibility XP, level titles, badges, and field quests inspired by crowd-powered contribution loops.
-- **Local persistence** via `localStorage` so the MVP works without standing up a backend.
+- **Myth-history route:** the voyage follows major Argonaut stops such as Iolcus, Lemnos, Cyzicus/Mysia, Phineus, the Symplegades, and Colchis.
+- **Historically grounded supplies:** inventory uses staples and trade goods with strong ancient Greek relevance such as barley, wine, olive oil, and silver.
+- **Readable MVP structure:** a single-screen React app keeps the loop obvious: provision, make port decisions, sail, read the log, and either reach Colchis or fail.
+- **Local persistence:** the current run saves in `localStorage`, so the MVP can be opened and resumed without a backend.
+
+## Research backbone
+
+The in-app route and text were informed by a mix of ancient-source aggregations and modern reference material:
+
+- **Diodorus Siculus, *Library of History* 4.40-58** for Jason's outfitting of the ship and the fifty-four companions.
+- **Apollonius Rhodius, *Argonautica*** for Phineus, the outward route, and the Symplegades as the defining navigation hazard.
+- **Theoi source pages on Apollo's oracles and the Gegenees** for ritual framing, port guidance, and the Mysian danger episode.
+- **Britannica and World History Encyclopedia** for modern synthesis on Jason, the Argonauts, and major Greek trade goods such as cereals, wine, and olives.
+
+The MVP deliberately labels the experience as **myth-history** rather than literal history. It follows ancient literary tradition closely, but it does not claim archaeological proof for legendary events.
 
 ## Getting started
 
@@ -22,8 +32,3 @@ npm run dev
 ```bash
 npm run build
 ```
-
-## Notes
-
-- This MVP stores report data in browser storage to simulate a storage house and vetting queue.
-- A future production version could swap the local persistence layer for an API and database-backed moderation service.
