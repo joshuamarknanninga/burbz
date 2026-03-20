@@ -1,14 +1,13 @@
-# Burbz OS MVP
+# Burbz Trading OS
 
-Burbz OS MVP is a lightweight React + Vite interface for running an off-grid Llama AI workstation. The current prototype focuses on a desktop-style experience for local chat, offline file access, model status, and power-aware operation.
+Burbz Trading OS is a responsive React + Vite marketplace concept inspired by cross-platform trading, route discovery, and community-driven gamification.
 
-## Features
+## Highlights
 
-- Desktop-inspired operating system shell for an offline AI assistant
-- Local Llama chat panel with editable prompt composer
-- Quick-prompt launcher for common field tasks
-- Offline vault preview for cached documents and model files
-- System health widgets showing local-only runtime and power status
+- Responsive layouts tuned for iPhone, Android, and desktop breakpoints
+- Waze-style trade route discovery with community activity and safety signals
+- Gamified marketplace loops with XP, streaks, badge progress, and squad goals
+- React-based UI architecture that is ready for future API, auth, and PWA extensions
 
 ## Development
 
@@ -17,7 +16,7 @@ npm install
 npm run dev
 ```
 
-## Build
+## Production build
 
 ```bash
 npm run build
