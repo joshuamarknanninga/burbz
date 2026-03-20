@@ -1,15 +1,402 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
-
-/* Custom global styles */
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: #f7fafc; /* Tailwind's bg-gray-100 equivalent */
-  color: #2d3748; /* Tailwind's text-gray-900 equivalent */
+:root {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #e5eefc;
+  background:
+    radial-gradient(circle at top, rgba(90, 120, 255, 0.28), transparent 30%),
+    linear-gradient(180deg, #08111f 0%, #040814 100%);
 }
 
-a {
-  text-decoration: none;
-  color: inherit;
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: #040814;
+}
+
+button,
+textarea {
+  font: inherit;
+}
+
+button {
+  border: 0;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.os-shell {
+  min-height: 100vh;
+  padding: 32px;
+  background:
+    linear-gradient(135deg, rgba(64, 91, 255, 0.1), transparent 45%),
+    radial-gradient(circle at bottom right, rgba(41, 214, 169, 0.12), transparent 20%);
+}
+
+.hero-panel {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  padding: 28px;
+  border: 1px solid rgba(159, 178, 255, 0.18);
+  border-radius: 24px;
+  background: rgba(7, 14, 28, 0.82);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: #7dcfff;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.8rem;
+}
+
+.hero-panel h1 {
+  margin: 0;
+  max-width: 720px;
+  font-size: clamp(2.4rem, 5vw, 4.6rem);
+  line-height: 0.95;
+}
+
+.hero-copy {
+  max-width: 680px;
+  margin-top: 16px;
+  color: #98a8c7;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(130px, 1fr));
+  gap: 12px;
+  min-width: 340px;
+}
+
+.hero-stats article,
+.window,
+.dock {
+  border: 1px solid rgba(154, 175, 255, 0.15);
+  background: rgba(10, 18, 36, 0.88);
+  backdrop-filter: blur(14px);
+}
+
+.hero-stats article {
+  padding: 16px;
+  border-radius: 18px;
+}
+
+.hero-stats span,
+.status-list span,
+.file-row span,
+.prompt-box span,
+.message-role {
+  color: #8b9ab8;
+  font-size: 0.82rem;
+}
+
+.hero-stats strong,
+.status-list strong,
+.file-row strong {
+  display: block;
+  margin-top: 8px;
+  color: #f8fbff;
+  font-size: 1rem;
+}
+
+.desktop-frame {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 18px;
+  min-height: 70vh;
+}
+
+.dock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 12px;
+  border-radius: 22px;
+}
+
+.dock-brand {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 8px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #70e1ff, #5a75ff);
+  color: #08111f;
+  font-weight: 800;
+}
+
+.dock-app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 12px 6px;
+  border-radius: 18px;
+  background: transparent;
+  color: #aab7d3;
+  cursor: pointer;
+  transition: 180ms ease;
+}
+
+.dock-app.is-active,
+.dock-app:hover,
+.chip:hover,
+.prompt-actions button:hover,
+.ghost-button:hover {
+  background: rgba(90, 117, 255, 0.18);
+  color: #fff;
+}
+
+.dock-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 1rem;
+}
+
+.dock-app span:last-child {
+  font-size: 0.72rem;
+  text-align: center;
+}
+
+.workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.topbar,
+.window-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.topbar {
+  padding: 14px 18px;
+  border: 1px solid rgba(154, 175, 255, 0.12);
+  border-radius: 18px;
+  background: rgba(8, 14, 28, 0.72);
+  color: #cdd8ef;
+}
+
+.topbar > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.topbar-meta {
+  display: flex;
+  gap: 16px;
+  color: #8d9cba;
+  font-size: 0.88rem;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #34d399;
+  box-shadow: 0 0 18px rgba(52, 211, 153, 0.8);
+}
+
+.window-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.9fr);
+  gap: 16px;
+  flex: 1;
+}
+
+.window {
+  border-radius: 24px;
+  padding: 18px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.window-header {
+  margin-bottom: 18px;
+}
+
+.window-header p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.window-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.window-controls span {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.conversation {
+  display: grid;
+  gap: 12px;
+}
+
+.message {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.message p,
+.message ul {
+  margin: 0;
+}
+
+.message ul {
+  padding-left: 18px;
+  color: #dbe6ff;
+}
+
+.message.assistant {
+  border: 1px solid rgba(85, 213, 255, 0.15);
+}
+
+.message.user {
+  border: 1px solid rgba(111, 119, 255, 0.16);
+  background: rgba(90, 117, 255, 0.12);
+}
+
+.message.soft {
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+}
+
+.prompt-box {
+  display: block;
+  margin-top: 18px;
+}
+
+.prompt-box textarea {
+  width: 100%;
+  margin-top: 10px;
+  padding: 14px;
+  border: 1px solid rgba(154, 175, 255, 0.16);
+  border-radius: 16px;
+  resize: vertical;
+  color: #eff5ff;
+  background: rgba(4, 8, 20, 0.82);
+}
+
+.prompt-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.prompt-actions button,
+.chip {
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ebf1ff;
+  cursor: pointer;
+  transition: 180ms ease;
+}
+
+.ghost-button {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(154, 175, 255, 0.14) !important;
+}
+
+.sidebar-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.window-header.compact {
+  margin-bottom: 14px;
+}
+
+.chip-list,
+.status-list,
+.file-list {
+  display: grid;
+  gap: 10px;
+}
+
+.chip {
+  text-align: left;
+}
+
+.status-list div,
+.file-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.file-row div {
+  display: grid;
+  gap: 4px;
+}
+
+@media (max-width: 1100px) {
+  .hero-panel,
+  .window-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-stats {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 800px) {
+  .os-shell {
+    padding: 18px;
+  }
+
+  .desktop-frame {
+    grid-template-columns: 1fr;
+  }
+
+  .dock {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .dock-brand {
+    flex: 0 0 auto;
+  }
+
+  .dock-app {
+    min-width: 88px;
+  }
+
+  .topbar,
+  .topbar-meta,
+  .prompt-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }

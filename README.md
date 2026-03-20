@@ -1,16 +1,24 @@
-# Neighborhood Explorer
+# Burbz OS MVP
 
-Neighborhood Explorer is a dynamic map-based application that allows users to explore and discover detailed information about various neighborhoods. The app is built using React.js, Tailwind CSS, and Mapbox GL JS.
+Burbz OS MVP is a lightweight React + Vite interface for running an off-grid Llama AI workstation. The current prototype focuses on a desktop-style experience for local chat, offline file access, model status, and power-aware operation.
 
 ## Features
 
-- Interactive map with user-generated labels and insights
-- Responsive design with Tailwind CSS
-- Mapbox GL JS integration for customizable and interactive maps
+- Desktop-inspired operating system shell for an offline AI assistant
+- Local Llama chat panel with editable prompt composer
+- Quick-prompt launcher for common field tasks
+- Offline vault preview for cached documents and model files
+- System health widgets showing local-only runtime and power status
 
-## Installation
+## Development
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/neighborhood-explorer.git
-   cd neighborhood-explorer
+```bash
+npm install
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build
+```

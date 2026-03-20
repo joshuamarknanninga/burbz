@@ -1,10 +1,13 @@
 {
   "name": "burbz",
+  "private": true,
   "version": "1.0.0",
-  "description": "\"mapping app for specific areas\"",
-  "main": "index.js",
+  "type": "module",
+  "description": "Off-grid Llama AI MVP desktop built with React and Vite.",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "repository": {
     "type": "git",
@@ -16,12 +19,14 @@
     "url": "https://github.com/joshuamarknanninga/burbz/issues"
   },
   "homepage": "https://github.com/joshuamarknanninga/burbz#readme",
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
   "devDependencies": {
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.41",
-    "tailwindcss": "^3.4.10"
-  },
-  "dependencies": {
-    "mapbox-gl": "^3.6.0"
+    "tailwindcss": "^3.4.10",
+    "vite": "^5.4.8"
   }
 }
