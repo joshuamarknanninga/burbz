@@ -1,0 +1,26 @@
+{
+  "name": "Burbz Blitz",
+  "short_name": "Burbz",
+  "description": "A funny, informational neighborhood radar app with Waze-style gamified reporting.",
+  "theme_color": "#11121a",
+  "background_color": "#11121a",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "start_url": "/",
+  "id": "/",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

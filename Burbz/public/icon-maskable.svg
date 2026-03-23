@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Burbz Blitz maskable icon</title>
+  <desc id="desc">Maskable icon with oversized gradient pin.</desc>
+  <defs>
+    <linearGradient id="bg" x1="64" x2="448" y1="48" y2="464" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffb36a" />
+      <stop offset="1" stop-color="#ff5f93" />
+    </linearGradient>
+    <linearGradient id="pin" x1="142" x2="370" y1="112" y2="394" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#81f4d4" />
+      <stop offset="1" stop-color="#57a9ff" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="132" fill="#11121a" />
+  <path d="M256 74c-73.45 0-133 59.55-133 133 0 92.23 106.72 198.46 122.18 213.25a15.2 15.2 0 0 0 21.64 0C282.28 405.46 389 299.23 389 207c0-73.45-59.55-133-133-133Z" fill="url(#bg)"/>
+  <circle cx="256" cy="207" r="79" fill="url(#pin)"/>
+  <path d="m256 154 16.37 33.11 36.62 5.33-26.5 25.84 6.25 36.49L256 237.56l-32.74 17.21 6.25-36.49-26.5-25.84 36.62-5.33L256 154Z" fill="#11121a"/>
+</svg>
